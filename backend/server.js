@@ -875,28 +875,42 @@ No direct competitor data available for comparison. Base analysis on industry st
 5. **Evidence-Based**: Support each point with specific data or logical reasoning
 
 ### OUTPUT SPECIFICATIONS:
-Provide analysis in the following JSON format with exactly 4-6 points per category:
 
-\`\`\`json
+**CRITICAL FORMATTING REQUIREMENT:**
+Return ONLY a pure JSON object - NO additional text, headers, explanations, or markdown formatting.
+
+Your response must:
+- Start directly with the opening brace {
+- Contain ONLY the JSON object
+- Have NO text before or after the JSON
+- Have NO markdown code blocks (no \`\`\`json or \`\`\`)
+- Have NO report headers, titles, or analysis sections
+- Be valid, parseable JSON with proper syntax
+
+Expected JSON structure (4-6 points per category):
+
 {
   "Strengths": [
     "Specific strength with supporting metric/evidence",
-    "Another strength with quantitative backing"
+    "Another strength with quantitative backing",
+    "Additional strength with competitive comparison"
   ],
   "Weaknesses": [
     "Specific weakness with data support",
-    "Another weakness with competitive comparison"
+    "Another weakness with competitive comparison",
+    "Additional weakness with industry benchmark"
   ],
   "Opportunities": [
     "Market opportunity with strategic rationale",
-    "Growth opportunity with implementation pathway"
+    "Growth opportunity with implementation pathway",
+    "Additional opportunity with market trend support"
   ],
   "Threats": [
     "Competitive threat with specific evidence",
-    "Market threat with impact assessment"
+    "Market threat with impact assessment",
+    "Additional threat with risk evaluation"
   ]
 }
-\`\`\`
 
 ### QUALITY STANDARDS:
 - Each point must be specific, measurable, and actionable
@@ -906,6 +920,8 @@ Provide analysis in the following JSON format with exactly 4-6 points per catego
 - Ensure logical consistency between categories
 - Use professional business terminology
 - Double-check all numerical references for accuracy
+
+**FINAL REMINDER: Return ONLY the JSON object. NO headers, NO explanations, NO analysis sections, NO markdown. Just the raw JSON starting with { and ending with }**
 
 ### STRATEGIC FOCUS AREAS:
 1. **Digital Presence**: Social media performance and online engagement
@@ -968,10 +984,15 @@ async function generateReportWithGroq(prompt, reportType, apiKeyOverride = null,
     // Gemini API configuration
     apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     headers = { "Content-Type": "application/json" };
+    
+    const systemPrompt = reportType === 'swot-analysis'
+      ? `You are an expert business analyst. You MUST respond with ONLY a valid JSON object. No markdown, no explanations, no text before or after the JSON. Start with { and end with }.`
+      : `You are an expert business analyst specializing in ${reportType} reports. Provide detailed, actionable insights in a structured format.`;
+    
     requestBody = {
       contents: [{
         parts: [{
-          text: `You are an expert business analyst specializing in ${reportType} reports. Provide detailed, actionable insights in a structured format.\n\n${prompt}`
+          text: `${systemPrompt}\n\n${prompt}`
         }]
       }],
       generationConfig: {
@@ -992,7 +1013,9 @@ async function generateReportWithGroq(prompt, reportType, apiKeyOverride = null,
       messages: [
         {
           role: "system",
-          content: `You are an expert business analyst specializing in ${reportType} reports. Provide detailed, actionable insights in a structured format.`
+          content: reportType === 'swot-analysis' 
+            ? `You are an expert business analyst. You MUST respond with ONLY a valid JSON object. No markdown, no explanations, no text before or after the JSON. Start with { and end with }.`
+            : `You are an expert business analyst specializing in ${reportType} reports. Provide detailed, actionable insights in a structured format.`
         },
         {
           role: "user",
@@ -1012,6 +1035,80 @@ async function generateReportWithGroq(prompt, reportType, apiKeyOverride = null,
       content = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     } else {
       content = response.data.choices?.[0]?.message?.content || "";
+    }
+    
+    // For SWOT analysis, clean and format the JSON into readable text
+    if (reportType === 'swot-analysis') {
+      console.log('🔧 Cleaning and formatting SWOT response...');
+      
+      // Remove all markdown code blocks and formatting
+      content = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+      
+      // Remove common report headers, footers, and metadata
+      content = content.replace(/Generated on:.*$/gim, ''); // Remove "Generated on" lines
+      content = content.replace(/Page \d+ of \d+/gi, ''); // Remove "Page X of Y"
+      content = content.replace(/SWOT Analysis Report?/gi, ''); // Remove report titles
+      content = content.replace(/Analysis Date:.*$/gim, ''); // Remove date headers
+      
+      // Remove everything before the first { and after the last }
+      content = content.replace(/^[\s\S]*?(?={)/m, '');
+      content = content.replace(/}[\s\S]*$/m, '}');
+      
+      // Clean up any remaining whitespace issues
+      content = content.trim();
+      
+      // Try to extract and validate the JSON object
+      const jsonMatch = content.match(/{[\s\S]*}/);
+      if (jsonMatch) {
+        try {
+          // Parse and validate JSON structure
+          const parsed = JSON.parse(jsonMatch[0]);
+          
+          // Verify it has the expected SWOT structure
+          if (parsed.Strengths && parsed.Weaknesses && parsed.Opportunities && parsed.Threats) {
+            // Format as readable text instead of JSON
+            let formattedContent = '';
+            
+            formattedContent += '**STRENGTHS**\n\n';
+            parsed.Strengths.forEach((item, index) => {
+              formattedContent += `${index + 1}. ${item}\n\n`;
+            });
+            
+            formattedContent += '\n**WEAKNESSES**\n\n';
+            parsed.Weaknesses.forEach((item, index) => {
+              formattedContent += `${index + 1}. ${item}\n\n`;
+            });
+            
+            formattedContent += '\n**OPPORTUNITIES**\n\n';
+            parsed.Opportunities.forEach((item, index) => {
+              formattedContent += `${index + 1}. ${item}\n\n`;
+            });
+            
+            formattedContent += '\n**THREATS**\n\n';
+            parsed.Threats.forEach((item, index) => {
+              formattedContent += `${index + 1}. ${item}\n\n`;
+            });
+            
+            content = formattedContent.trim();
+            
+            console.log('✅ SWOT formatted as readable text');
+            console.log(`   - Strengths: ${parsed.Strengths.length} items`);
+            console.log(`   - Weaknesses: ${parsed.Weaknesses.length} items`);
+            console.log(`   - Opportunities: ${parsed.Opportunities.length} items`);
+            console.log(`   - Threats: ${parsed.Threats.length} items`);
+          } else {
+            console.warn('⚠️ SWOT JSON missing required categories');
+            console.warn('   Found keys:', Object.keys(parsed));
+          }
+        } catch (e) {
+          console.warn('⚠️ SWOT JSON parsing issue:', e.message);
+          console.warn('   Content preview:', content.substring(0, 200));
+          // Keep original content if parsing fails
+        }
+      } else {
+        console.warn('⚠️ No JSON object found in SWOT response');
+        console.warn('   Content preview:', content.substring(0, 200));
+      }
     }
     
     return {
@@ -1109,8 +1206,57 @@ async function getSWOTAnalysis(prompt, userId, firmId) {
       content = response.data.choices?.[0]?.message?.content || "{}";
     }
     
+    // Aggressively clean the content
+    content = content.replace(/```json\s*/gi, '').replace(/```\s*/g, ''); // Remove markdown
+    content = content.replace(/Generated on:.*$/gim, ''); // Remove "Generated on" lines
+    content = content.replace(/Page \d+ of \d+/gi, ''); // Remove "Page X of Y"
+    content = content.replace(/SWOT Analysis Report?/gi, ''); // Remove report titles
+    content = content.replace(/Analysis Date:.*$/gim, ''); // Remove date headers
+    content = content.replace(/^[\s\S]*?(?={)/m, ''); // Remove text before first {
+    content = content.replace(/}[\s\S]*$/m, '}'); // Remove text after last }
+    content = content.trim();
+    
     const jsonMatch = content.match(/{[\s\S]*}/);
-    return jsonMatch ? jsonMatch[0] : "{}";
+    if (jsonMatch) {
+      try {
+        // Parse and validate JSON structure
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Verify it has the expected SWOT structure
+        if (parsed.Strengths && parsed.Weaknesses && parsed.Opportunities && parsed.Threats) {
+          // Format as readable text instead of JSON
+          let formattedContent = '';
+          
+          formattedContent += '**STRENGTHS**\n\n';
+          parsed.Strengths.forEach((item, index) => {
+            formattedContent += `${index + 1}. ${item}\n\n`;
+          });
+          
+          formattedContent += '\n**WEAKNESSES**\n\n';
+          parsed.Weaknesses.forEach((item, index) => {
+            formattedContent += `${index + 1}. ${item}\n\n`;
+          });
+          
+          formattedContent += '\n**OPPORTUNITIES**\n\n';
+          parsed.Opportunities.forEach((item, index) => {
+            formattedContent += `${index + 1}. ${item}\n\n`;
+          });
+          
+          formattedContent += '\n**THREATS**\n\n';
+          parsed.Threats.forEach((item, index) => {
+            formattedContent += `${index + 1}. ${item}\n\n`;
+          });
+          
+          return formattedContent.trim();
+        }
+        
+        return JSON.stringify(parsed, null, 2);
+      } catch (e) {
+        console.warn('⚠️ JSON parse error in getSWOTAnalysis:', e.message);
+        return jsonMatch[0];
+      }
+    }
+    return "{}";
   } catch (err) {
     console.error(`❌ Error calling ${provider || 'Groq'} API:`, err.response?.data || err);
     return "{}";
@@ -3957,6 +4103,16 @@ app.post("/api/generate-report/:reportType", async (req, res) => {
   try {
     console.log(`[ReportGeneration] Starting ${reportType} report for company ${companyId} with ${competitorIds.length} competitors`);
     
+    // Define which reports need Google Reviews scraping
+    const reportsNeedingReviews = [
+      'swot-analysis',
+      'competitor-analysis', 
+      'brand-presence',
+      'ux-comparison'
+    ];
+    
+    const needsReviewScraping = reportsNeedingReviews.includes(reportType);
+    
     // 1. Get company data (Google Review URLs and Region)
     const [company] = await db.query(
       `SELECT cc.COMPANY_ID, cc.NAME, cc.INDUSTRY, cc.WEBSITE,
@@ -4003,21 +4159,30 @@ app.post("/api/generate-report/:reportType", async (req, res) => {
         )
       : [];
 
-    // 3. Scrape Google Reviews FIRST (before social media scrapers)
-    console.log(`[ReportGeneration] Scraping Google reviews...`);
-    const allCompanies = [company, ...competitors];
-    const reviewsData = await GoogleReviewsService.getReviewsForCompanies(allCompanies, userid, firmid);
-    
-    // Attach review data to company and competitors
-    company.googleReviews = reviewsData[company.COMPANY_ID] || { averageRating: null, totalReviews: 0, topReviews: [] };
-    competitors.forEach(comp => {
-      comp.googleReviews = reviewsData[comp.COMPANY_ID] || { averageRating: null, totalReviews: 0, topReviews: [] };
-    });
-    
-    console.log(`[ReportGeneration] Reviews collected - Company: ${company.googleReviews.totalReviews} reviews (${company.googleReviews.averageRating}★)`);
-    competitors.forEach(comp => {
-      console.log(`[ReportGeneration] - ${comp.NAME}: ${comp.googleReviews.totalReviews} reviews (${comp.googleReviews.averageRating}★)`);
-    });
+    // 3. Conditionally scrape Google Reviews (only for reports that need it)
+    if (needsReviewScraping) {
+      console.log(`[ReportGeneration] ${reportType} needs reviews - Scraping Google reviews...`);
+      const allCompanies = [company, ...competitors];
+      const reviewsData = await GoogleReviewsService.getReviewsForCompanies(allCompanies, userid, firmid);
+      
+      // Attach review data to company and competitors
+      company.googleReviews = reviewsData[company.COMPANY_ID] || { averageRating: null, totalReviews: 0, topReviews: [] };
+      competitors.forEach(comp => {
+        comp.googleReviews = reviewsData[comp.COMPANY_ID] || { averageRating: null, totalReviews: 0, topReviews: [] };
+      });
+      
+      console.log(`[ReportGeneration] Reviews collected - Company: ${company.googleReviews.totalReviews} reviews (${company.googleReviews.averageRating}★)`);
+      competitors.forEach(comp => {
+        console.log(`[ReportGeneration] - ${comp.NAME}: ${comp.googleReviews.totalReviews} reviews (${comp.googleReviews.averageRating}★)`);
+      });
+    } else {
+      console.log(`[ReportGeneration] ${reportType} doesn't need reviews - Skipping scraping, using DB data only`);
+      // Set empty review data
+      company.googleReviews = { averageRating: null, totalReviews: 0, topReviews: [] };
+      competitors.forEach(comp => {
+        comp.googleReviews = { averageRating: null, totalReviews: 0, topReviews: [] };
+      });
+    }
 
     // 4. Social media scraping DISABLED - using existing DB data only
     console.log(`[ReportGeneration] Social media scraping disabled - using existing database values`);

@@ -60,10 +60,10 @@ async function getGoogleReviews(company, options = {}) {
   let duplicateFound = false;
   
   try {
-    // Launch browser in visible mode
+    // Launch browser in headless mode
     const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
     browser = await puppeteer.launch({
-      headless: false,  // Visible browser for debugging
+      headless: true,  // Headless mode for production
       executablePath,
       args: [
         '--no-sandbox',
@@ -72,7 +72,9 @@ async function getGoogleReviews(company, options = {}) {
         '--disable-accelerated-2d-canvas',
         '--no-first-run',
         '--no-zygote',
-        '--disable-gpu'
+        '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--disable-extensions'
       ]
     });
     
