@@ -1,0 +1,21 @@
+body, .container, .table, .card, .modal {
+  color: #222;
+  background: #f8fafc;
+}
+.button, .nav-item, .table-row {
+  color: #1677ff;
+  background: #fff;
+}
+:focus {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
+}
+[aria-busy="true"] {
+  cursor: progress;
+}
+[role="dialog"] {
+  outline: none;
+}
+main, nav, header, footer, section {
+  display: block;
+}

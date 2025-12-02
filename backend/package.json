@@ -1,0 +1,54 @@
+{
+  "name": "compa-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js",
+    "start:api": "node api/app.js",
+    "dev:api": "nodemon api/app.js",
+    "scrape:facebook": "node scrappers/facebook_follower_count_v2.js",
+    "scrape:instagram": "node scrappers/instagram_follower_count_v2.js",
+    "scrape:linkedin": "node scrappers/linkedin_follower_count_v2.js",
+    "scrape:facebook-v1": "node scrappers/facebook_follower_count.js",
+    "scrape:instagram-linux": "node scrappers/instagram_follower_count_linux_sb_v2.js",
+    "scrape:linkedin-linux": "node scrappers/linkdin_follower_count_linux_sb_v3.js"
+  },
+  "keywords": [
+    "competitor-analysis",
+    "web-scraping",
+    "api",
+    "social-media",
+    "follower-tracking"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Competitor Analysis Backend with Web Scrapers",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.0",
+    "axios": "^1.10.0",
+    "body-parser": "^1.20.3",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "llama": "^2.1.14",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.15.2",
+    "openai": "^4.75.0",
+    "pg": "^8.13.1",
+    "puppeteer": "^24.31.0",
+    "selenium-webdriver": "^4.36.0",
+    "serpapi": "^2.1.0"
+  },
+  "devDependencies": {
+    "chromedriver": "^142.0.3",
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}
