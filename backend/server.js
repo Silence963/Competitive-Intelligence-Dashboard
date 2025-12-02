@@ -4915,103 +4915,88 @@ app.post("/api/generate-summary-report", async (req, res) => {
   }
 });
 
-// Action Plan Prompt Generator (now only bullet points, includes user input and status)
-function generateActionPlanPrompt(company, competitor, userInput, status, existingActionPlan, companyReports = {}, competitorReports = {}) {
-  let prompt = `${getDateContext()}\n\nYou are a business strategist. For the company "${company.NAME}" in the "${company.INDUSTRY}" industry, generate a comprehensive step-by-step action plan to overcome the competitor "${competitor.NAME}".\n`;
+// Action Plan Prompt Generator - Focused on iterative improvement based on previous plan + user feedback
+function generateActionPlanPrompt(company, competitor, userInput, status, existingActionPlan) {
+  const { dateNote } = getCurrentDateContext();
+  let prompt = `${dateNote}\n\nYou are a business strategist. `;
   
-  // Include company's existing reports for context
-  if (Object.keys(companyReports).length > 0) {
-    prompt += `\n=== COMPANY ANALYSIS REPORTS (${company.NAME}) ===\n`;
-    prompt += `The following reports have been generated for ${company.NAME}. Use these insights to create a data-driven action plan:\n\n`;
+  // Check if there's an existing action plan to build upon
+  if (existingActionPlan && (existingActionPlan.USER_INPUT || existingActionPlan.STEP_ACTION)) {
+    prompt += `\n=== TASK: IMPROVE EXISTING ACTION PLAN ===\n`;
+    prompt += `For the company "${company.NAME}" (${company.INDUSTRY} industry) competing against "${competitor.NAME}".\n\n`;
     
-    const reportOrder = ['swot', 'competitive-analysis', 'content-strategy', 'seo-analysis', 'brand-positioning', 'target-audience'];
+    prompt += `--- PREVIOUS ACTION PLAN ---\n`;
+    prompt += `Status: "${existingActionPlan.STATUS || 'unknown'}"\n`;
+    prompt += `Created: ${existingActionPlan.CREATED_AT}\n`;
+    prompt += `Last Updated: ${existingActionPlan.UPDATED_AT || existingActionPlan.CREATED_AT}\n\n`;
     
-    reportOrder.forEach(reportType => {
-      if (companyReports[reportType]) {
-        const reportTitle = reportType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        prompt += `--- ${reportTitle} Report ---\n`;
-        prompt += `${companyReports[reportType].content.substring(0, 3000)}\n\n`;
-      }
-    });
+    const previousPlan = existingActionPlan.USER_INPUT?.trim() || existingActionPlan.STEP_ACTION?.trim();
+    prompt += `Previous Plan Content:\n${previousPlan}\n`;
+    prompt += `--- END PREVIOUS PLAN ---\n\n`;
     
-    // Include any other reports not in the priority list
-    Object.keys(companyReports).forEach(reportType => {
-      if (!reportOrder.includes(reportType)) {
-        const reportTitle = reportType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        prompt += `--- ${reportTitle} Report ---\n`;
-        prompt += `${companyReports[reportType].content.substring(0, 2000)}\n\n`;
-      }
-    });
-    
-    prompt += `=== END COMPANY REPORTS ===\n\n`;
-  }
-  
-  // Include competitor's reports for context
-  if (Object.keys(competitorReports).length > 0) {
-    prompt += `\n=== COMPETITOR ANALYSIS REPORTS (${competitor.NAME}) ===\n`;
-    prompt += `The following reports have been generated for competitor ${competitor.NAME}. Use these to identify their strengths and weaknesses:\n\n`;
-    
-    const reportOrder = ['swot', 'competitive-analysis', 'content-strategy', 'seo-analysis'];
-    
-    reportOrder.forEach(reportType => {
-      if (competitorReports[reportType]) {
-        const reportTitle = reportType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        prompt += `--- ${reportTitle} Report ---\n`;
-        prompt += `${competitorReports[reportType].content.substring(0, 2000)}\n\n`;
-      }
-    });
-    
-    prompt += `=== END COMPETITOR REPORTS ===\n\n`;
-  }
-  
-  // Include existing action plan information if available
-  if (existingActionPlan) {
-    prompt += `\n--- EXISTING ACTION PLAN CONTEXT ---\n`;
-    prompt += `Previous action plan status: "${existingActionPlan.STATUS || 'unknown'}"\n`;
-    prompt += `Previous action plan created: ${existingActionPlan.CREATED_AT}\n`;
-    
-    if (existingActionPlan.USER_INPUT && existingActionPlan.USER_INPUT.trim()) {
-      prompt += `Previous action plan content:\n"${existingActionPlan.USER_INPUT.trim()}"\n`;
-    } else if (existingActionPlan.STEP_ACTION && existingActionPlan.STEP_ACTION.trim()) {
-      prompt += `Previous action plan content:\n"${existingActionPlan.STEP_ACTION.trim()}"\n`;
+    // User feedback is critical for iteration
+    if (userInput && userInput.trim()) {
+      prompt += `=== USER FEEDBACK FOR IMPROVEMENT ===\n`;
+      prompt += `The user has provided this feedback to improve the action plan:\n"${userInput.trim()}"\n`;
+      prompt += `This feedback is CRITICAL - incorporate it directly into the new plan.\n`;
+      prompt += `=== END USER FEEDBACK ===\n\n`;
     }
     
-    prompt += `\nBased on this existing action plan, you should:\n`;
-    prompt += `- If the status was "done" or "skipped", create a new advanced plan building on the previous work\n`;
-    prompt += `- If the status was "pending" or "in-progress", improve and refine the existing plan\n`;
-    prompt += `- Consider what has been learned from the previous plan\n`;
-    prompt += `- Address any gaps or weaknesses in the previous approach\n`;
-    prompt += `--- END EXISTING CONTEXT ---\n\n`;
+    // Status-based guidance
+    prompt += `=== CURRENT STATUS & INSTRUCTIONS ===\n`;
+    prompt += `Current Status: "${status || 'pending'}"\n\n`;
+    
+    if (status === 'done' || status === 'skipped') {
+      prompt += `Since the previous plan is marked as "${status}", generate a NEW, MORE ADVANCED action plan that:\n`;
+      prompt += `- Builds on what was accomplished in the previous plan\n`;
+      prompt += `- Addresses the next level of strategic initiatives\n`;
+      prompt += `- Incorporates any user feedback provided\n`;
+      prompt += `- Takes the competitive strategy to the next phase\n`;
+    } else if (status === 'in-progress') {
+      prompt += `The plan is in-progress. Generate an IMPROVED version that:\n`;
+      prompt += `- Refines and enhances the existing action items\n`;
+      prompt += `- Incorporates the user's feedback to address gaps or concerns\n`;
+      prompt += `- Adds more specific, actionable details where needed\n`;
+      prompt += `- Maintains continuity with ongoing work\n`;
+    } else {
+      prompt += `The plan is pending. Generate an ENHANCED version that:\n`;
+      prompt += `- Improves upon the previous plan based on user feedback\n`;
+      prompt += `- Makes actions more specific and measurable\n`;
+      prompt += `- Addresses any weaknesses or gaps identified\n`;
+      prompt += `- Provides clearer implementation guidance\n`;
+    }
+    prompt += `=== END INSTRUCTIONS ===\n\n`;
+    
+  } else {
+    // No existing plan - generate fresh plan
+    prompt += `Generate a comprehensive action plan for "${company.NAME}" in the "${company.INDUSTRY}" industry to overcome competitor "${competitor.NAME}".\n\n`;
+    
+    if (userInput && userInput.trim()) {
+      prompt += `=== USER REQUIREMENTS ===\n`;
+      prompt += `The user has specified these requirements:\n"${userInput.trim()}"\n`;
+      prompt += `Make sure to address these requirements in the action plan.\n`;
+      prompt += `=== END USER REQUIREMENTS ===\n\n`;
+    }
+    
+    if (status) {
+      prompt += `Initial Status: "${status}"\n\n`;
+    }
   }
   
-  if (userInput && userInput.trim()) {
-    prompt += `\n=== USER FEEDBACK/CONTEXT ===\n`;
-    prompt += `The user has provided the following feedback/context for the action plan:\n"${userInput.trim()}"\n`;
-    prompt += `Take this feedback into account when generating the plan.\n`;
-    prompt += `=== END USER FEEDBACK ===\n\n`;
-  }
-  
-  if (status && typeof status === "string") {
-    prompt += `\nThe user has selected the following status for this action plan: "${status}". Consider this status when generating the plan and ensure the plan is actionable for this status.\n`;
-  }
-  
-  prompt += `\n=== ACTION PLAN REQUIREMENTS ===\n`;
-  prompt += `Based on ALL the analysis reports provided above, create a comprehensive, data-driven action plan that:\n`;
-  prompt += `1. Leverages ${company.NAME}'s strengths identified in the SWOT and other reports\n`;
-  prompt += `2. Addresses ${company.NAME}'s weaknesses and threats\n`;
-  prompt += `3. Exploits ${competitor.NAME}'s weaknesses and gaps\n`;
-  prompt += `4. Counters ${competitor.NAME}'s strengths with strategic differentiation\n`;
-  prompt += `5. Includes specific, actionable steps across multiple business areas:\n`;
+  prompt += `\n=== ACTION PLAN OUTPUT FORMAT ===\n`;
+  prompt += `Create a comprehensive, actionable plan with:\n`;
+  prompt += `1. Clear prioritization (Immediate/Short-term/Long-term)\n`;
+  prompt += `2. Specific, measurable actions\n`;
+  prompt += `3. Time-bound objectives\n`;
+  prompt += `4. Actionable steps across key business areas:\n`;
   prompt += `   - Digital Marketing & Social Media Strategy\n`;
   prompt += `   - Content & SEO Optimization\n`;
   prompt += `   - Brand Positioning & Messaging\n`;
   prompt += `   - Customer Experience & Engagement\n`;
   prompt += `   - Competitive Differentiation\n`;
-  prompt += `   - Performance Metrics & KPIs\n`;
-  prompt += `6. Prioritizes quick wins and long-term strategic initiatives\n`;
-  prompt += `7. Provides specific, measurable, and time-bound actions\n\n`;
+  prompt += `   - Performance Metrics & KPIs\n\n`;
   
-  prompt += `Return the result as a well-organized bullet-point list with clear categories. Do not use checkboxes, dropdowns, or input types. Only provide clear, actionable bullet points.\n`;
+  prompt += `Return as a well-organized bullet-point list. NO checkboxes, dropdowns, or input fields.\n\n`;
   prompt += `Example format:\n`;
   prompt += `**Immediate Actions (0-30 days):**\n- Specific action step 1\n- Specific action step 2\n\n`;
   prompt += `**Short-term Strategy (1-3 months):**\n- Strategic initiative 1\n- Strategic initiative 2\n\n`;
@@ -5066,66 +5051,20 @@ app.post("/api/generate-action-plan", async (req, res) => {
       );
       if (existing) {
         existingActionPlan = existing;
+        console.log(`[ActionPlan] Found existing action plan with status: ${existing.STATUS}`);
       }
     } catch (err) {
       console.log("No existing action plan found or error fetching:", err);
     }
 
-    // Fetch all relevant reports for the company
-    let companyReports = {};
-    try {
-      const reports = await db.query(
-        `SELECT REPORT_TYPE, REPORT_CONTENT, CREATED_AT
-         FROM AIA_REPORTS
-         WHERE COMPANY_ID = ? AND USERID = ? AND FIRMID = ?
-         ORDER BY CREATED_AT DESC`,
-        [companyId, userid, firmid]
-      );
-      
-      // Group reports by type, keeping only the most recent of each type
-      reports.forEach(report => {
-        if (!companyReports[report.REPORT_TYPE]) {
-          companyReports[report.REPORT_TYPE] = {
-            content: report.REPORT_CONTENT,
-            createdAt: report.CREATED_AT
-          };
-        }
-      });
-      
-      console.log(`[ActionPlan] Found ${Object.keys(companyReports).length} report types for company ${company.NAME}`);
-    } catch (err) {
-      console.log("Error fetching company reports:", err);
-      companyReports = {};
+    // Generate improved action plan based ONLY on: old plan + user input + status
+    // No longer fetching company/competitor reports - focus on iterative improvement
+    const prompt = generateActionPlanPrompt(company, competitor, userInput, statusToStore, existingActionPlan);
+    
+    console.log(`[ActionPlan] Generating ${existingActionPlan ? 'improved' : 'new'} action plan for ${company.NAME} vs ${competitor.NAME}`);
+    if (userInput) {
+      console.log(`[ActionPlan] User input: ${userInput.substring(0, 100)}${userInput.length > 100 ? '...' : ''}`);
     }
-
-    // Fetch competitor reports as well
-    let competitorReports = {};
-    try {
-      const reports = await db.query(
-        `SELECT REPORT_TYPE, REPORT_CONTENT, CREATED_AT
-         FROM AIA_REPORTS
-         WHERE COMPANY_ID = ? AND USERID = ? AND FIRMID = ?
-         ORDER BY CREATED_AT DESC`,
-        [competitorId, userid, firmid]
-      );
-      
-      reports.forEach(report => {
-        if (!competitorReports[report.REPORT_TYPE]) {
-          competitorReports[report.REPORT_TYPE] = {
-            content: report.REPORT_CONTENT,
-            createdAt: report.CREATED_AT
-          };
-        }
-      });
-      
-      console.log(`[ActionPlan] Found ${Object.keys(competitorReports).length} report types for competitor ${competitor.NAME}`);
-    } catch (err) {
-      console.log("Error fetching competitor reports:", err);
-      competitorReports = {};
-    }
-
-    // Pass all data to the enhanced prompt generator
-    const prompt = generateActionPlanPrompt(company, competitor, userInput, statusToStore, existingActionPlan, companyReports, competitorReports);
     
     // Let generateReportWithGroq handle the API key and provider detection
     const report = await generateReportWithGroq(prompt, "action-plan", null, userid, firmid);
