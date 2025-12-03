@@ -195,7 +195,12 @@ const LandingPage = () => {
         <button
           className="register-top-btn"
           style={{ position: 'absolute', top: 24, right: 32, zIndex: 10, padding: '0.7rem 1.5rem', fontSize: '1rem', borderRadius: '24px', background: '#1677ff', color: '#fff', border: 'none', fontWeight: 600, boxShadow: '0 2px 8px rgba(22,119,255,0.07)', cursor: 'pointer', transition: 'background 0.18s' }}
-          onClick={() => navigate('/register')}
+          onClick={() => {
+            const registerUrl = userId && firmId
+              ? `/register?userid=${encodeURIComponent(userId)}&firmid=${encodeURIComponent(firmId)}`
+              : '/register';
+            navigate(registerUrl);
+          }}
         >
           Register Company
         </button>

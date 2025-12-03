@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import './styles/components.css';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [companyName, setCompanyName] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
   const [industry, setIndustry] = useState("");
@@ -16,6 +17,18 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  
+  // Extract userid and firmid from URL
+  const [userId, setUserId] = useState(null);
+  const [firmId, setFirmId] = useState(null);
+  
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const uid = params.get('userid');
+    const fid = params.get('firmid');
+    if (uid) setUserId(uid);
+    if (fid) setFirmId(fid);
+  }, [location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,6 +57,8 @@ export default function RegisterPage() {
           googleUrl: googleUrl.trim() || null,
           linkedinUrl: linkedinUrl.trim() || null,
           instagramUrl: instagramUrl.trim() || null,
+          userid: userId,
+          firmid: firmId
         }),
       });
       
@@ -68,9 +83,12 @@ export default function RegisterPage() {
       setGoogleUrl("");
       setLinkedinUrl("");
       setInstagramUrl("");
-      // Redirect to landing page CTA after success
+      // Redirect to dashboard with credentials after success
       setTimeout(() => {
-        navigate("/", { state: { scrollToCta: true } });
+        const dashboardUrl = userId && firmId
+          ? `/dashboard?userid=${encodeURIComponent(userId)}&firmid=${encodeURIComponent(firmId)}`
+          : "/";
+        navigate(dashboardUrl, { state: { scrollToCta: !userId || !firmId } });
       }, 1200);
     } catch (err) {
       setError(err.message || "Registration failed");
@@ -88,7 +106,12 @@ export default function RegisterPage() {
             type="button"
             className="register-back-btn"
             style={{ background: 'none', color: '#1677ff', border: 'none', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', padding: '0.2rem 0.8rem', borderRadius: '16px', transition: 'background 0.18s' }}
-            onClick={() => navigate('/')}
+            onClick={() => {
+              const backUrl = userId && firmId
+                ? `/?userid=${encodeURIComponent(userId)}&firmid=${encodeURIComponent(firmId)}`
+                : '/';
+              navigate(backUrl);
+            }}
           >
             ← Back
           </button>

@@ -186,12 +186,20 @@ const SocialMediaSwot = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await fetch("http://localhost:5600/competitors");
+        // Include userid and firmid in the request
+        const url = `http://localhost:5600/competitors?userid=${encodeURIComponent(userID || '')}&firmid=${encodeURIComponent(firmID || '')}`;
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setCompanies(Array.isArray(data) ? data : []);
+        const companiesData = Array.isArray(data) ? data : [];
+        setCompanies(companiesData);
+        
+        // Auto-select the first company if available
+        if (companiesData.length > 0 && !selectedCompany) {
+          setSelectedCompany(companiesData[0].id);
+        }
       } catch (error) {
         console.error("❌ Error fetching companies:", error);
         showNotification("Failed to load companies. Please try again.", "error");
@@ -199,8 +207,11 @@ const SocialMediaSwot = () => {
       }
     };
 
-    fetchCompanies();
-  }, []);
+    // Only fetch if we have credentials
+    if (userID && firmID) {
+      fetchCompanies();
+    }
+  }, [userID, firmID, selectedCompany]);
 
   // (Optional) Could display a banner if tenant IDs missing
 
@@ -2547,49 +2558,49 @@ const modalContentStyle = {
                   marginBottom: 4,
                   letterSpacing: '-0.01em'
                 }}>
-                  Select Your Company
+                  Your Company
                 </label>
                 <p style={{
                   margin: 0,
                   fontSize: '0.875rem',
                   color: 'var(--color-text-tertiary)'
-                }}>Choose the company you want to analyze</p>
+                }}>Currently analyzing this company</p>
               </div>
             </div>
             
-            <select 
-              className="form-select" 
-              value={selectedCompany} 
-              onChange={(e) => setSelectedCompany(e.target.value)}
+            <div
               style={{ 
                 width: '100%',
-                background: '#ffffff', 
+                background: '#f8fafc', 
                 color: 'var(--color-text-primary)', 
                 fontSize: '1.125rem',
-                fontWeight: 500,
+                fontWeight: 600,
                 border: '2px solid var(--color-border)', 
                 borderRadius: 12,
                 padding: '16px 20px',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer'
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-primary)';
-                e.currentTarget.style.boxShadow = '0 0 0 4px rgba(22, 119, 255, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
               }}
             >
-              <option value="" style={{ color: 'var(--color-text-muted)' }}>-- Select a company --</option>
-              {companies.map((c) => (
-                <option key={c.id} value={c.id} style={{ color: 'var(--color-text-primary)' }}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              <span style={{ fontSize: '1.25rem' }}>🏢</span>
+              <span>{companies.find(c => c.id === selectedCompany)?.name || 'No company selected'}</span>
+            </div>
+
+            {companies.length === 0 && (
+              <p style={{
+                marginTop: '12px',
+                padding: '12px 16px',
+                background: '#fef3c7',
+                border: '1px solid #fbbf24',
+                borderRadius: '8px',
+                color: '#92400e',
+                fontSize: '0.875rem'
+              }}>
+                ℹ️ No companies found. Please register a company first.
+              </p>
+            )}
           </div>
           
           {/* SWOT Display - Premium Card */}

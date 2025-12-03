@@ -291,7 +291,22 @@ app.get("/api/get-action-plans", async (req, res) => {
 // Competitors API
 app.get("/competitors", async (req, res) => {
   try {
-    const rows = await db.getRows("SELECT COMPANY_ID as id, NAME as name FROM COMPA_COMPANIES");
+    // Extract user credentials
+    const userId = req.userId || req.query.userid || null;
+    const firmId = req.firmId || req.query.firmid || null;
+    
+    if (!userId || !firmId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'userid and firmid are required' 
+      });
+    }
+    
+    // Filter companies by user ownership
+    const rows = await db.query(
+      "SELECT COMPANY_ID as id, NAME as name FROM COMPA_COMPANIES WHERE MAIN_USERID = ? ORDER BY NAME",
+      [userId]
+    );
     res.json(rows);
   } catch (err) {
     console.error('❌ Error fetching competitors:', err);
@@ -304,6 +319,30 @@ app.get("/competitors", async (req, res) => {
 app.get("/api/view-competitors/:companyId", async (req, res) => {
   const { companyId } = req.params;
   try {
+    // Extract user credentials
+    const userId = req.userId || req.query.userid || null;
+    const firmId = req.firmId || req.query.firmid || null;
+    
+    if (!userId || !firmId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'userid and firmid are required' 
+      });
+    }
+    
+    // Verify user owns this company
+    const [ownerCheck] = await db.query(
+      "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ? AND MAIN_USERID = ?",
+      [companyId, userId]
+    );
+    
+    if (!ownerCheck) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You do not own this company' 
+      });
+    }
+    
     // Get all competitors for this company
     const competitors = await db.query(
       `SELECT 
@@ -345,6 +384,17 @@ app.post("/api/add-competitor", async (req, res) => {
   // 1. Input validation
   const { companyId, competitorName, website, industry, region, facebookUrl, instagramUrl, linkedinUrl, googleReviewUrl } = req.body;
   
+  // Extract user credentials
+  const userId = req.userId || req.query.userid || req.body.userid || null;
+  const firmId = req.firmId || req.query.firmid || req.body.firmid || null;
+  
+  if (!userId || !firmId) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'userid and firmid are required' 
+    });
+  }
+  
   // Validate required fields
   if (!companyId || !competitorName) {
     return res.status(400).json({ 
@@ -372,20 +422,20 @@ app.post("/api/add-competitor", async (req, res) => {
     await connection.beginTransaction();
     
     try {
-      // 2. Check if company exists
-      const [companyExistsRows] = await connection.query(
-        "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ?",
-        [sanitizedCompanyId]
+      // 2. Verify user owns this company
+      const [ownerCheckRows] = await connection.query(
+        "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ? AND MAIN_USERID = ?",
+        [sanitizedCompanyId, userId]
       );
-      const companyExists = companyExistsRows[0];
+      const ownerCheck = ownerCheckRows[0];
 
-      if (!companyExists) {
+      if (!ownerCheck) {
         await connection.rollback();
         connection.release();
-        return res.status(404).json({
+        return res.status(403).json({
           success: false,
-          error: `Company with ID ${sanitizedCompanyId} not found`,
-          code: "COMPANY_NOT_FOUND"
+          error: `Access denied: You do not own company ${sanitizedCompanyId}`,
+          code: "ACCESS_DENIED"
         });
       }
 
@@ -561,6 +611,17 @@ app.post("/api/save-preferences", async (req, res) => {
   let { timeRange } = req.body;
   const prefType = 'COMPA';
   
+  // Extract user credentials
+  const userId = req.userId || req.query.userid || req.body.userid || null;
+  const firmId = req.firmId || req.query.firmid || req.body.firmid || null;
+  
+  if (!userId || !firmId) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'userid and firmid are required' 
+    });
+  }
+  
   // Default to 'weekly' if not provided
   if (!timeRange) {
     timeRange = 'weekly';
@@ -581,6 +642,19 @@ app.post("/api/save-preferences", async (req, res) => {
   }
 
   try {
+    // Verify user owns this company
+    const [ownerCheck] = await db.query(
+      "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ? AND MAIN_USERID = ?",
+      [companyId, userId]
+    );
+    
+    if (!ownerCheck) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You do not own this company' 
+      });
+    }
+    
     await db.execute(
       `INSERT INTO AIA_SMP_PREFERENCES (COMPANY_ID, NAME, PREF_TYPE, TIME_RANGE, COMPETITOR_IDS) VALUES (?, ?, ?, ?, ?)`,
       [companyId, name, prefType, timeRange, JSON.stringify(competitorIds || [])]
@@ -597,6 +671,17 @@ app.get("/api/load-preferences/:companyId", async (req, res) => {
   const { companyId } = req.params;
   const prefType = 'COMPA';
   
+  // Extract user credentials
+  const userId = req.userId || req.query.userid || null;
+  const firmId = req.firmId || req.query.firmid || null;
+  
+  if (!userId || !firmId) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'userid and firmid are required' 
+    });
+  }
+  
   if (!companyId) {
     return res.status(400).json({ 
       success: false,
@@ -605,6 +690,19 @@ app.get("/api/load-preferences/:companyId", async (req, res) => {
   }
 
   try {
+    // Verify user owns this company
+    const [ownerCheck] = await db.query(
+      "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ? AND MAIN_USERID = ?",
+      [companyId, userId]
+    );
+    
+    if (!ownerCheck) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You do not own this company' 
+      });
+    }
+    
     const rows = await db.query(
       `SELECT PREF_ID as prefId, 
               COMPANY_ID as companyId, 
@@ -723,6 +821,17 @@ app.get("/combined-info", async (req, res) => {
   const companyId = req.query.companyId;
   if (!companyId) return res.status(400).json({ error: "Company ID is required." });
 
+  // Extract user credentials
+  const userId = req.userId || req.query.userid || null;
+  const firmId = req.firmId || req.query.firmid || null;
+  
+  if (!userId || !firmId) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'userid and firmid are required' 
+    });
+  }
+
   // Optional filters
   const timeRange = req.query.timeRange || null;
   let competitorIds = [];
@@ -734,6 +843,19 @@ app.get("/combined-info", async (req, res) => {
   }
 
   try {
+    // Verify user owns this company
+    const [ownerCheck] = await db.query(
+      "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ? AND MAIN_USERID = ?",
+      [companyId, userId]
+    );
+    
+    if (!ownerCheck) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You do not own this company' 
+      });
+    }
+    
     const followersRows = await db.query(
       `SELECT sf.*, cc.NAME AS COMPANY_NAME 
        FROM SMP_FOLLOWERS sf 
@@ -765,17 +887,13 @@ app.get("/combined-info", async (req, res) => {
       return res.status(404).json({ error: "Company not found." });
     }
 
-    // If tenant context provided, generate and persist SWOT; otherwise return raw data only
-    const userId = req.userId || req.query.userid || null;
-    const firmId = req.firmId || req.query.firmid || null;
+    // Generate and persist SWOT
     let swotAnalysis = null;
     let swotId = null;
-    if (userId && firmId) {
-      const prompt = generateSWOTPrompt(companyInfoRows, followersRows);
-      swotAnalysis = await getSWOTAnalysis(prompt, userId, firmId);
-      swotId = await storeSWOT(companyId, 0, swotAnalysis);
-      await saveReportToBusinessBooks(companyId, 'swot-analysis', swotAnalysis, userId, firmId);
-    }
+    const prompt = generateSWOTPrompt(companyInfoRows, followersRows);
+    swotAnalysis = await getSWOTAnalysis(prompt, userId, firmId);
+    swotId = await storeSWOT(companyId, 0, swotAnalysis);
+    await saveReportToBusinessBooks(companyId, 'swot-analysis', swotAnalysis, userId, firmId);
 
     res.json({
       followers: followersRows,
@@ -785,7 +903,7 @@ app.get("/combined-info", async (req, res) => {
       swotAnalysis,
       swotId,
       swotJson: swotAnalysis,
-      tenantApplied: !!(userId && firmId)
+      tenantApplied: true
     });
   } catch (err) {
     console.error("❌ Error generating/storing SWOT:", err);
@@ -4049,6 +4167,17 @@ app.post("/api/generate-report/:reportType", async (req, res) => {
   const { reportType } = req.params;
   let { companyId, competitorIds = [], userid, firmid } = req.body || {};
 
+  // Extract user credentials from multiple sources
+  const userId = userid || req.userId || req.query.userid || req.body.userid || null;
+  const firmId = firmid || req.firmId || req.query.firmid || req.body.firmid || null;
+  
+  if (!userId || !firmId) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'userid and firmid are required' 
+    });
+  }
+
   // Robust competitor ID processing
   if (typeof competitorIds === 'string') {
     competitorIds = competitorIds.split(',').map(id => id.trim()).filter(id => id);
@@ -4101,6 +4230,19 @@ app.post("/api/generate-report/:reportType", async (req, res) => {
   }
 
   try {
+    // Verify user owns this company
+    const [ownerCheck] = await db.query(
+      "SELECT COMPANY_ID FROM COMPA_COMPANIES WHERE COMPANY_ID = ? AND MAIN_USERID = ?",
+      [companyId, userId]
+    );
+    
+    if (!ownerCheck) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied: You do not own this company' 
+      });
+    }
+    
     console.log(`[ReportGeneration] Starting ${reportType} report for company ${companyId} with ${competitorIds.length} competitors`);
     
     // Define which reports need Google Reviews scraping
@@ -4606,8 +4748,8 @@ app.post('/api/register-company', async (req, res) => {
         region ? region.trim() : '',
         region ? region.trim() : '',
         region ? region.trim() : '',
-        userid || 0,
-        userid || 0,
+        firmid || 0,  // PORTAL_ID
+        userid || 0,  // MEMBERID
         contactEmail ? contactEmail.trim() : null,
         industry.trim(),
         0,
@@ -4618,14 +4760,14 @@ app.post('/api/register-company', async (req, res) => {
       ]
     );
     const vendorId = vendorResult.insertId;
-    console.log(`✅ Inserted into kf_vendor with VEND_ID: ${vendorId}`);
+    console.log(`✅ Inserted into kf_vendor with VEND_ID: ${vendorId}, MEMBERID: ${userid}, PORTAL_ID: ${firmid}`);
 
-    // Step 2: Insert into COMPA_COMPANIES using VEND_ID as COMPANY_ID
+    // Step 2: Insert into COMPA_COMPANIES using VEND_ID as COMPANY_ID and set MAIN_USERID
     await db.query(
-      `INSERT INTO COMPA_COMPANIES (COMPANY_ID, NAME, WEBSITE, INDUSTRY) VALUES (?, ?, ?, ?)`,
-      [vendorId, companyName.trim(), companyUrl ? companyUrl.trim() : '', industry.trim()]
+      `INSERT INTO COMPA_COMPANIES (COMPANY_ID, NAME, WEBSITE, INDUSTRY, MAIN_USERID, VENDOR_ID) VALUES (?, ?, ?, ?, ?, ?)`,
+      [vendorId, companyName.trim(), companyUrl ? companyUrl.trim() : '', industry.trim(), userid || null, vendorId]
     );
-    console.log(`✅ Inserted into COMPA_COMPANIES with COMPANY_ID: ${vendorId}`);
+    console.log(`✅ Inserted into COMPA_COMPANIES with COMPANY_ID: ${vendorId}, MAIN_USERID: ${userid}`);
 
     // Step 3: Insert social URLs into SMP_FOLLOWERS
     await db.query(
