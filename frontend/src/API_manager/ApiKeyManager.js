@@ -439,19 +439,97 @@ const ApiKeyManager = ({
   const clearMessage = () => setMessage(null);
 
   return (
-    <div className="apikey-modal-overlay">
-      <div className="apikey-modal-container">
-        <div className="apikey-modal-header">
-          <h2>🔧 AI Provider Configuration</h2>
+    <div className="apikey-modal-overlay" style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      backdropFilter: 'blur(6px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: 0,
+      margin: 0,
+      overflow: 'hidden'
+    }}>
+      <div className="apikey-modal-container" style={{
+        backgroundColor: 'white',
+        borderRadius: '24px',
+        boxShadow: '0 30px 100px rgba(0, 0, 0, 0.5)',
+        width: '98vw',
+        maxWidth: '1800px',
+        height: '96vh',
+        maxHeight: '96vh',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        margin: 0
+      }}>
+        <div className="apikey-modal-header" style={{
+          position: 'sticky',
+          top: 0,
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          padding: '36px 60px',
+          borderRadius: '24px 24px 0 0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          zIndex: 10,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+          flexShrink: 0
+        }}>
+          <h2 style={{ margin: 0, fontSize: '30px', fontWeight: '700', letterSpacing: '-0.5px' }}>🔧 AI Provider Configuration</h2>
           <button 
             className="apikey-modal-close" 
             onClick={onClose}
             aria-label="Close modal"
             disabled={isSubmitting}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              color: 'white',
+              fontSize: '32px',
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s',
+              fontWeight: '300',
+              lineHeight: '1',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting) {
+                e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                e.target.style.transform = 'scale(1.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting) {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.target.style.transform = 'scale(1)';
+              }
+            }}
           >
             ×
           </button>
         </div>
+
+        <div style={{ 
+          padding: '48px 60px', 
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          flex: 1,
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#cbd5e1 #f1f5f9'
+        }}>
 
         {/* Status Messages */}
         {error && (
@@ -513,7 +591,15 @@ const ApiKeyManager = ({
         )}
 
         {/* Add API Key Form */}
-        <form className="apikey-form" onSubmit={handleSubmit}>
+        <form className="apikey-form" onSubmit={handleSubmit} style={{
+          background: 'linear-gradient(to bottom, #f8fafc, #ffffff)',
+          padding: '36px 48px',
+          borderRadius: '18px',
+          border: '2px solid #e2e8f0',
+          marginBottom: '48px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+          maxWidth: '100%'
+        }}>
           {/* Hidden username field for accessibility/autofill */}
           <input
             type="text"
@@ -524,7 +610,13 @@ const ApiKeyManager = ({
           />
 
           <div>
-            <label htmlFor="category">
+            <label htmlFor="category" style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: '600', 
+              fontSize: '14px',
+              color: '#334155'
+            }}>
               Category <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <select
@@ -534,14 +626,19 @@ const ApiKeyManager = ({
               required
               disabled={isSubmitting}
               style={{
-                padding: '12px 16px',
-                border: '2px solid #e1e5e9',
-                borderRadius: '8px',
-                fontSize: '14px',
+                padding: '14px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '10px',
+                fontSize: '15px',
                 width: '100%',
-                marginBottom: '16px',
-                backgroundColor: 'white'
+                marginBottom: '20px',
+                backgroundColor: 'white',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontWeight: '500'
               }}
+              onFocus={(e) => e.target.style.borderColor = '#667eea'}
+              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
             >
               <option value="">Select a category</option>
               <option value="IMAGE_GENERATION">🖼️ Image Generation</option>
@@ -552,7 +649,13 @@ const ApiKeyManager = ({
               <option value="VIDEO_GENERATION">🎬 Video Generation</option>
             </select>
 
-            <label htmlFor="llmProvider">
+            <label htmlFor="llmProvider" style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: '600', 
+              fontSize: '14px',
+              color: '#334155'
+            }}>
               LLM Provider <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <select
@@ -562,13 +665,19 @@ const ApiKeyManager = ({
               required
               disabled={isSubmitting || !selectedCategory}
               style={{
-                padding: '12px 16px',
-                border: '2px solid #e1e5e9',
-                borderRadius: '8px',
-                fontSize: '14px',
+                padding: '14px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '10px',
+                fontSize: '15px',
                 width: '100%',
-                backgroundColor: 'white'
+                marginBottom: '20px',
+                backgroundColor: !selectedCategory ? '#f1f5f9' : 'white',
+                cursor: !selectedCategory ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                fontWeight: '500'
               }}
+              onFocus={(e) => !isSubmitting && selectedCategory && (e.target.style.borderColor = '#667eea')}
+              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
             >
               <option value="">Select LLM Provider</option>
               {selectedCategory && providersByCategory[selectedCategory]
@@ -648,10 +757,14 @@ const ApiKeyManager = ({
                   );
                 })}
             </select>
-          </div>
 
-          <div>
-            <label htmlFor="apiKey">
+            <label htmlFor="apiKey" style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: '600', 
+              fontSize: '14px',
+              color: '#334155'
+            }}>
               API Key <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <input
@@ -664,15 +777,20 @@ const ApiKeyManager = ({
               disabled={isSubmitting}
               autoComplete="new-password"
               style={{
-                padding: '12px 16px',
-                border: '2px solid #e1e5e9',
-                borderRadius: '8px',
-                fontSize: '14px',
-                width: '100%'
+                padding: '14px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '10px',
+                fontSize: '15px',
+                width: '100%',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s',
+                fontFamily: 'monospace'
               }}
+              onFocus={(e) => e.target.style.borderColor = '#667eea'}
+              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
             />
-            <small style={{ color: '#6b7280', fontSize: '12px', display: 'block', marginTop: '4px' }}>
-              Your API key will be encrypted and stored securely
+            <small style={{ color: '#64748b', fontSize: '13px', display: 'block', marginTop: '8px', fontStyle: 'italic' }}>
+              🔒 Your API key will be encrypted and stored securely
             </small>
           </div>
 
@@ -681,8 +799,35 @@ const ApiKeyManager = ({
             className="submit-button"
             disabled={isSubmitting || loading}
             style={{
-              opacity: (isSubmitting || loading) ? 0.6 : 1,
-              cursor: (isSubmitting || loading) ? 'not-allowed' : 'pointer'
+              marginTop: '24px',
+              padding: '16px 32px',
+              borderRadius: '12px',
+              border: 'none',
+              background: (isSubmitting || loading) ? '#94a3b8' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              fontWeight: '700',
+              fontSize: '16px',
+              cursor: (isSubmitting || loading) ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              width: '100%',
+              transition: 'all 0.3s',
+              boxShadow: (isSubmitting || loading) ? 'none' : '0 4px 16px rgba(102, 126, 234, 0.4)',
+              transform: 'translateY(0)'
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting && !loading) {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting && !loading) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 16px rgba(102, 126, 234, 0.4)';
+              }
             }}
           >
             {isSubmitting ? (
@@ -706,23 +851,61 @@ const ApiKeyManager = ({
 
         {/* Current Context Display */}
         <div style={{
-          marginTop: '20px',
-          padding: '15px',
-          background: '#f0f9ff',
-          borderRadius: '8px',
-          fontSize: '14px',
-          border: '1px solid #bae6fd'
+          marginTop: '32px',
+          padding: '24px 32px',
+          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+          borderRadius: '14px',
+          fontSize: '15px',
+          border: '2px solid #bae6fd',
+          boxShadow: '0 2px 8px rgba(186, 230, 253, 0.3)'
         }}>
-          <strong>🏢 Current Context:</strong> User ID: <code>{userId}</code>, Firm ID: <code>{firmId}</code>
-          <br />
-          <small style={{ color: '#0369a1', marginTop: '5px', display: 'block' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '20px' }}>🏢</span>
+            <strong style={{ fontSize: '15px', color: '#0c4a6e' }}>Current Context</strong>
+          </div>
+          <div style={{ marginLeft: '28px', color: '#0369a1' }}>
+            <div style={{ marginBottom: '4px' }}>
+              <strong>User ID:</strong> <code style={{ 
+                background: 'white', 
+                padding: '4px 8px', 
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#0c4a6e'
+              }}>{userId}</code>
+            </div>
+            <div>
+              <strong>Firm ID:</strong> <code style={{ 
+                background: 'white', 
+                padding: '4px 8px', 
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#0c4a6e'
+              }}>{firmId}</code>
+            </div>
+          </div>
+          <small style={{ color: '#075985', marginTop: '12px', display: 'block', marginLeft: '28px', fontStyle: 'italic' }}>
             All providers will be managed for this User/Firm combination
           </small>
         </div>
 
         {/* LLM Details Table */}
-        <div style={{ marginTop: '30px' }}>
-          <h3 style={{ marginBottom: '15px', color: '#374151' }}>📋 Configured Providers</h3>
+        <div style={{ marginTop: '40px' }}>
+          <h3 style={{ 
+            marginBottom: '24px', 
+            color: '#1e293b', 
+            fontSize: '22px',
+            fontWeight: '700',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            paddingBottom: '14px',
+            borderBottom: '3px solid #e2e8f0'
+          }}>
+            <span style={{ fontSize: '26px' }}>📋</span>
+            Configured Providers
+          </h3>
           
           {loading && !llmDetails.length ? (
             <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
@@ -751,16 +934,25 @@ const ApiKeyManager = ({
 
         {/* Instructions */}
         <div style={{
-          marginTop: '25px',
-          padding: '20px',
-          background: '#f9fafb',
-          borderRadius: '8px',
-          fontSize: '14px',
-          color: '#374151',
-          border: '1px solid #e5e7eb'
+          marginTop: '40px',
+          padding: '28px 32px',
+          background: 'linear-gradient(to bottom right, #fef3c7, #fde68a)',
+          borderRadius: '14px',
+          fontSize: '15px',
+          color: '#78350f',
+          border: '2px solid #fbbf24',
+          boxShadow: '0 2px 8px rgba(251, 191, 36, 0.2)'
         }}>
-          <strong>💡 Instructions:</strong>
-          <ul style={{ margin: '10px 0 0 0', paddingLeft: '20px', lineHeight: '1.6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '20px' }}>💡</span>
+            <strong style={{ fontSize: '16px' }}>Quick Instructions:</strong>
+          </div>
+          <ul style={{ 
+            marginLeft: '28px', 
+            marginTop: '8px', 
+            marginBottom: '0',
+            lineHeight: '1.8'
+          }}>
             <li>Select your preferred AI provider and enter your API key</li>
             <li>Only one provider can be active at a time per User/Firm combination</li>
             <li>The system will use your active provider for generating business reports</li>
@@ -769,13 +961,52 @@ const ApiKeyManager = ({
           </ul>
         </div>
 
-        {/* Animation styles */}
-        <style jsx="true">{`
+        {/* Animation and scrollbar styles */}
+        <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
+          
+          .apikey-modal-container::-webkit-scrollbar {
+            width: 10px;
+          }
+          
+          .apikey-modal-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+          }
+          
+          .apikey-modal-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+            transition: background 0.2s;
+          }
+          
+          .apikey-modal-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+          }
+          
+          .apikey-modal-container > div::-webkit-scrollbar {
+            width: 10px;
+          }
+          
+          .apikey-modal-container > div::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+          }
+          
+          .apikey-modal-container > div::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+            transition: background 0.2s;
+          }
+          
+          .apikey-modal-container > div::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+          }
         `}</style>
+        </div>
       </div>
     </div>
   );

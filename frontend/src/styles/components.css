@@ -763,6 +763,56 @@ body {
     padding: 16px;
     max-height: 95vh;
   }
+
+  .apikey-modal-overlay {
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .apikey-modal-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+  }
+
+  .apikey-modal-header {
+    padding: 20px 16px !important;
+    border-radius: 0 !important;
+  }
+
+  .apikey-modal-header h2 {
+    font-size: 20px !important;
+  }
+
+  .apikey-modal-header button {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 24px !important;
+  }
+
+  .apikey-form {
+    padding: 20px !important;
+  }
+  
+  .apikey-modal-container > div {
+    padding: 20px !important;
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (max-width: 1024px) {
+  .apikey-modal-overlay {
+    padding: 0 !important;
+  }
+  
+  .apikey-modal-container {
+    width: 98vw !important;
+    max-width: 98vw !important;
+    height: 98vh !important;
+    border-radius: 12px !important;
+  }
 }
 
 /* Dark mode support (when implemented) */

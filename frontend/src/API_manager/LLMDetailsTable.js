@@ -246,21 +246,22 @@ const LLMDetailsTable = ({
   }
 
   const tableHeaderStyle = {
-    padding: '12px 16px',
+    padding: '14px 20px',
     textAlign: 'left',
     fontWeight: '600',
-    fontSize: '14px',
-    color: '#374151',
-    borderBottom: '2px solid #e5e7eb',
-    background: '#f9fafb'
+    fontSize: '13px',
+    color: '#475569',
+    borderBottom: '2px solid #e2e8f0',
+    background: 'linear-gradient(to bottom, #f8fafc, #f1f5f9)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px'
   };
 
   const tableCellStyle = {
-    padding: '8px 16px',
+    padding: '16px 20px',
     fontSize: '14px',
-    color: '#374151',
-    borderBottom: '1px solid #e5e7eb',
-    height: '48px',
+    color: '#334155',
+    borderBottom: '1px solid #f1f5f9',
     verticalAlign: 'middle'
   };
 
@@ -269,15 +270,19 @@ const LLMDetailsTable = ({
     <span style={{
       display: 'inline-flex',
       alignItems: 'center',
-      padding: '4px 8px',
-      borderRadius: '12px',
+      gap: '6px',
+      padding: '6px 12px',
+      borderRadius: '16px',
       fontSize: '12px',
       fontWeight: '600',
-      backgroundColor: status === 'ACTIVE' ? '#d1fae5' : '#f3f4f6',
-      color: status === 'ACTIVE' ? '#065f46' : '#4b5563',
-      border: `1px solid ${status === 'ACTIVE' ? '#a7f3d0' : '#e5e7eb'}`
+      backgroundColor: status === 'ACTIVE' ? '#dcfce7' : '#f1f5f9',
+      color: status === 'ACTIVE' ? '#15803d' : '#64748b',
+      border: `1.5px solid ${status === 'ACTIVE' ? '#86efac' : '#cbd5e1'}`,
+      textTransform: 'uppercase',
+      letterSpacing: '0.3px'
     }}>
-      {status === 'ACTIVE' ? '✅ Active' : '❌ Inactive'}
+      <span style={{ fontSize: '10px' }}>{status === 'ACTIVE' ? '●' : '○'}</span>
+      {status === 'ACTIVE' ? 'Active' : 'Inactive'}
     </span>
   );
 
@@ -286,14 +291,14 @@ const LLMDetailsTable = ({
     <span style={{
       display: 'inline-flex',
       alignItems: 'center',
-      padding: '4px 8px',
-      borderRadius: '6px',
+      padding: '6px 12px',
+      borderRadius: '8px',
       fontSize: '12px',
       fontWeight: '600',
-      backgroundColor: `${typeColors[type] || '#e5e7eb'}20`,
-      color: typeColors[type] || '#4b5563',
-      border: `1px solid ${typeColors[type] || '#e5e7eb'}`,
-      whiteSpace: 'nowrap'
+      backgroundColor: `${typeColors[type] || '#e2e8f0'}`,
+      color: 'white',
+      whiteSpace: 'nowrap',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
     }}>
       {getProviderTypeLabel(type)}
     </span>
@@ -301,15 +306,21 @@ const LLMDetailsTable = ({
 
   // Provider cell component
   const ProviderCell = ({ provider }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
       <span style={{
-        fontSize: '18px',
-        width: '24px',
-        textAlign: 'center'
+        fontSize: '22px',
+        width: '32px',
+        height: '32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
       }}>
         {getProviderIcon(provider)}
       </span>
-      <span style={{ fontWeight: '500' }}>{provider}</span>
+      <span style={{ fontWeight: '600', fontSize: '14px', color: '#1e293b' }}>{provider}</span>
     </div>
   );
 
@@ -460,17 +471,17 @@ const LLMDetailsTable = ({
                         <td style={tableCellStyle}>
                           <StatusBadge status={item.STATUS} />
                         </td>
-                        <td style={{ ...tableCellStyle, textAlign: 'right' }}>
+                        <td style={{ ...tableCellStyle, textAlign: 'center' }}>
                           <button
                             onClick={() => toggleStatus(item.ID, item.LLM_PROVIDER, providerType, item.STATUS)}
                             disabled={loading}
                             style={{
-                              padding: '6px 12px',
-                              borderRadius: '6px',
+                              padding: '8px 16px',
+                              borderRadius: '8px',
                               border: 'none',
-                              backgroundColor: isActive ? '#f1f5f9' : '#3b82f6',
-                              color: isActive ? '#64748b' : 'white',
-                              fontWeight: '500',
+                              background: isActive ? 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                              color: isActive ? '#475569' : 'white',
+                              fontWeight: '600',
                               fontSize: '13px',
                               cursor: loading ? 'not-allowed' : 'pointer',
                               opacity: (loading && processingId === item.ID) ? 0.7 : 1,
@@ -478,14 +489,21 @@ const LLMDetailsTable = ({
                               alignItems: 'center',
                               gap: '6px',
                               transition: 'all 0.2s',
-                              minWidth: '90px',
+                              minWidth: '100px',
                               justifyContent: 'center',
-                              ':hover': !loading ? {
-                                backgroundColor: isActive ? '#e2e8f0' : '#2563eb',
-                              } : {},
-                              ':disabled': {
-                                opacity: 0.6,
-                                cursor: 'not-allowed'
+                              boxShadow: isActive ? 'none' : '0 2px 4px rgba(102, 126, 234, 0.3)',
+                              transform: 'translateY(0)'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!loading) {
+                                e.target.style.transform = 'translateY(-2px)';
+                                e.target.style.boxShadow = isActive ? '0 2px 4px rgba(0,0,0,0.1)' : '0 4px 8px rgba(102, 126, 234, 0.4)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!loading) {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = isActive ? 'none' : '0 2px 4px rgba(102, 126, 234, 0.3)';
                               }
                             }}
                           >

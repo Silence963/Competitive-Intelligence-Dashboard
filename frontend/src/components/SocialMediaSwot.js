@@ -26,10 +26,10 @@ const SocialMediaSwot = () => {
   const [isAddingCompetitor, setIsAddingCompetitor] = useState(false);
   
   // Sidebar collapsible sections state
-  const [reportsExpanded, setReportsExpanded] = useState(true);
-  const [competitorsExpanded, setCompetitorsExpanded] = useState(true);
-  const [actionPlansExpanded, setActionPlansExpanded] = useState(true);
-  const [settingsExpanded, setSettingsExpanded] = useState(true);
+  const [reportsExpanded, setReportsExpanded] = useState(false);
+  const [competitorsExpanded, setCompetitorsExpanded] = useState(false);
+  const [actionPlansExpanded, setActionPlansExpanded] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
   // --- Saved Action Plans Modal State and Functions ---
   const [showSavedActionPlansModal, setShowSavedActionPlansModal] = useState(false);
   const [savedActionPlans, setSavedActionPlans] = useState([]);
@@ -781,7 +781,7 @@ const modalOverlayStyle = {
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  backgroundColor: 'rgba(0, 0, 0, 0.85)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -2202,102 +2202,6 @@ const modalContentStyle = {
             overflowX: 'hidden',
             flex: 1
           }}>
-            {/* Generate Reports Section - Collapsible */}
-            <div style={{ marginBottom: '12px' }}>
-              <button
-                onClick={() => setReportsExpanded(!reportsExpanded)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '8px 12px',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  borderRadius: '6px',
-                  transition: 'background 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-hover)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                <div style={{ 
-                  fontSize: '12px', 
-                  fontWeight: 600, 
-                  color: 'var(--color-text-muted)', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '0.5px'
-                }}>Reports</div>
-                <span style={{ 
-                  fontSize: '14px',
-                  color: 'var(--color-text-muted)',
-                  transform: reportsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.2s ease'
-                }}>▶</span>
-              </button>
-              
-              {/* Collapsible Reports List */}
-              <div style={{
-                maxHeight: reportsExpanded ? '1000px' : '0',
-                overflow: 'hidden',
-                transition: 'max-height 0.3s ease-in-out'
-              }}>
-              {reportTypes.map((report) => (
-                <button
-                  key={report.id}
-                  onClick={() => generateReport(report.id)}
-                  disabled={!selectedCompany || generatingReport}
-                  className="sidebar-nav-link"
-                  style={{ 
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '12px',
-                    background: generatingReport ? 'rgba(22, 119, 255, 0.1)' : 'transparent',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: generatingReport ? 'wait' : 'pointer',
-                    transition: 'all 0.2s ease',
-                    color: generatingReport ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                    opacity: (!selectedCompany || generatingReport) ? 0.6 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.background = 'var(--color-bg-hover)';
-                      e.currentTarget.style.color = 'var(--color-primary)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = generatingReport ? 'rgba(22, 119, 255, 0.1)' : 'transparent';
-                    e.currentTarget.style.color = generatingReport ? 'var(--color-primary)' : 'var(--color-text-secondary)';
-                  }}
-                >
-                  <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {generatingReport && (
-                      <span style={{ 
-                        display: 'inline-block',
-                        width: '12px',
-                        height: '12px',
-                        border: '2px solid var(--color-primary)',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 0.8s linear infinite'
-                      }}></span>
-                    )}
-                    {report.name}
-                  </span>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
-                    {generatingReport ? 'Generating report...' : report.description}
-                  </span>
-                </button>
-              ))}
-              </div>
-            </div>
-
             {/* Competitor Management Section - Collapsible */}
             <div style={{ marginBottom: '12px' }}>
               <button
@@ -2402,6 +2306,102 @@ const modalContentStyle = {
                 <span style={{ marginRight: '8px' }}>➕</span>
                 {isAddingCompetitor ? 'Adding...' : 'Add Competitor'}
               </button>
+              </div>
+            </div>
+
+            {/* Generate Reports Section - Collapsible */}
+            <div style={{ marginBottom: '12px' }}>
+              <button
+                onClick={() => setReportsExpanded(!reportsExpanded)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: '6px',
+                  transition: 'background 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <div style={{ 
+                  fontSize: '12px', 
+                  fontWeight: 600, 
+                  color: 'var(--color-text-muted)', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px'
+                }}>Reports</div>
+                <span style={{ 
+                  fontSize: '14px',
+                  color: 'var(--color-text-muted)',
+                  transform: reportsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease'
+                }}>▶</span>
+              </button>
+              
+              {/* Collapsible Reports List */}
+              <div style={{
+                maxHeight: reportsExpanded ? '1000px' : '0',
+                overflow: 'hidden',
+                transition: 'max-height 0.3s ease-in-out'
+              }}>
+              {reportTypes.map((report) => (
+                <button
+                  key={report.id}
+                  onClick={() => generateReport(report.id)}
+                  disabled={!selectedCompany || generatingReport}
+                  className="sidebar-nav-link"
+                  style={{ 
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '12px',
+                    background: generatingReport ? 'rgba(22, 119, 255, 0.1)' : 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: generatingReport ? 'wait' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    color: generatingReport ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    opacity: (!selectedCompany || generatingReport) ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e.currentTarget.disabled) {
+                      e.currentTarget.style.background = 'var(--color-bg-hover)';
+                      e.currentTarget.style.color = 'var(--color-primary)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = generatingReport ? 'rgba(22, 119, 255, 0.1)' : 'transparent';
+                    e.currentTarget.style.color = generatingReport ? 'var(--color-primary)' : 'var(--color-text-secondary)';
+                  }}
+                >
+                  <span style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {generatingReport && (
+                      <span style={{ 
+                        display: 'inline-block',
+                        width: '12px',
+                        height: '12px',
+                        border: '2px solid var(--color-primary)',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite'
+                      }}></span>
+                    )}
+                    {report.name}
+                  </span>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
+                    {generatingReport ? 'Generating report...' : report.description}
+                  </span>
+                </button>
+              ))}
               </div>
             </div>
 
@@ -3023,7 +3023,7 @@ const modalContentStyle = {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: 'rgba(0,0,0,0.85)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -3303,7 +3303,19 @@ const modalContentStyle = {
 
       {/* Create Preference Modal */}
       {showCreatePreferenceModal && (
-        <div className="modal-overlay" onClick={() => setShowCreatePreferenceModal(false)}>
+        <div className="modal-overlay" onClick={() => setShowCreatePreferenceModal(false)} style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          overflowY: 'auto'
+        }}>
           <div
             className="modal-content animate-scaleIn"
             ref={createPreferenceModalRef}
@@ -3316,7 +3328,11 @@ const modalContentStyle = {
               overflowY: 'auto',
               display: 'flex', 
               flexDirection: 'column', 
-              gap: '20px'
+              gap: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e5e7eb',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}
           >
             <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#1a1a1a' }}>Create New Preference</h3>
@@ -3423,11 +3439,36 @@ const modalContentStyle = {
 
       {/* Edit Preference Modal */}
       {showEditPreferenceModal && editPrefForm && (
-        <div className="modal edit-preference-modal">
+        <div className="modal-overlay" onClick={() => setShowEditPreferenceModal(false)} style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          overflowY: 'auto'
+        }}>
           <div
             className="modal-content"
             ref={editPreferenceModalRef}
-            style={{ padding: 24, width: 'min(560px, 92vw)', display: 'flex', flexDirection: 'column', gap: 12 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              padding: '32px', 
+              width: 'min(560px, 92vw)', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e5e7eb',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              maxHeight: '85vh',
+              overflowY: 'auto'
+            }}
           >
             <h3>Edit Preference</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -3554,7 +3595,20 @@ const modalContentStyle = {
 
       {/* Add Competitor Modal */}
       {showAddCompetitorModal && (
-        <div className="modal-overlay" onClick={() => setShowAddCompetitorModal(false)} style={{ alignItems: 'flex-start', paddingTop: '120px' }}>
+        <div className="modal-overlay" onClick={() => setShowAddCompetitorModal(false)} style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          paddingTop: '120px',
+          zIndex: 9999,
+          overflowY: 'auto'
+        }}>
           <div 
             className="modal-content animate-scaleIn"
             ref={addCompetitorModalRef}
@@ -3567,7 +3621,11 @@ const modalContentStyle = {
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              gap: '20px'
+              gap: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e5e7eb',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}
           >
             <h3 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#1a1a1a' }}>Add Competitor</h3>
@@ -3804,39 +3862,11 @@ const modalContentStyle = {
 
       {/* Add ApiKeyManager modal */}
       {showApiManager && (
-        <div className="modal api-manager-modal" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 2000
-        }}>
-          <div style={{
-            width: '92%',
-            maxWidth: 900,
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            background: '#fff',
-            borderRadius: 8,
-            padding: 16,
-            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-          }}>
-            <button
-              onClick={() => setShowApiManager(false)}
-              style={{ float: 'right', marginBottom: 8, background: 'transparent', border: 'none', fontSize: 18, cursor: 'pointer' }}
-              aria-label="Close API Manager"
-            >
-              ✕
-            </button>
-            {/* Pass user/firm ids and a close handler */}
-            <ApiKeyManager userid={userID} firmid={firmID} onClose={() => setShowApiManager(false)} />
-          </div>
-        </div>
+        <ApiKeyManager 
+          userid={userID} 
+          firmid={firmID} 
+          onClose={() => setShowApiManager(false)} 
+        />
       )}
 
       {/* Missing Info Modal */}
@@ -3847,7 +3877,7 @@ const modalContentStyle = {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(0,0,0,0.4)',
+          background: 'rgba(0,0,0,0.85)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -3885,7 +3915,7 @@ const modalContentStyle = {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(0,0,0,0.3)',
+          background: 'rgba(0,0,0,0.85)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -3919,7 +3949,7 @@ const modalContentStyle = {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: 'rgba(0,0,0,0.85)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
