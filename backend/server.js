@@ -1038,6 +1038,9 @@ Expected JSON structure (4-6 points per category):
 - Ensure logical consistency between categories
 - Use professional business terminology
 - Double-check all numerical references for accuracy
+- **NEVER use placeholder terms like "Market Player", "User", "Competitor X", or "Company Y"**
+- **ALWAYS refer to companies by their actual names** (e.g., "${company.NAME}", competitor names from the data)
+- **Use specific, professional language** - no generic placeholders or vague references
 
 **FINAL REMINDER: Return ONLY the JSON object. NO headers, NO explanations, NO analysis sections, NO markdown. Just the raw JSON starting with { and ending with }**
 
@@ -1048,8 +1051,25 @@ Expected JSON structure (4-6 points per category):
 4. **Growth Potential**: Emerging opportunities and expansion areas
 5. **Risk Assessment**: Competitive pressures and market challenges
 6. **Operational Excellence**: Efficiency and performance metrics
+7. **Recent Developments**: Latest news, achievements, product launches, partnerships, awards, and significant events with dates
+8. **Market Events**: Recent industry developments, competitor announcements, and market shifts
 
-Generate the SWOT analysis now, ensuring each point provides actionable strategic value.`;
+### RESEARCH REQUIREMENT:
+**CRITICAL:** Before generating the SWOT analysis, research and incorporate:
+- Latest news about ${company.NAME} (past 3-6 months)
+- Recent achievements, awards, or recognition
+- New product/service launches
+- Recent partnerships or collaborations
+- Significant company announcements
+- Recent market events affecting the company
+- Industry developments impacting ${company.INDUSTRY} sector
+
+**Include specific dates** for all recent events and news items in your analysis. When mentioning recent developments in any SWOT category, always cite:
+- What happened
+- When it happened (specific date or month/year)
+- Strategic significance
+
+Generate the SWOT analysis now, ensuring each point provides actionable strategic value and incorporates the most current information available.`;
 
   return prompt;
 }
@@ -1508,6 +1528,27 @@ Provide a comprehensive report structured as follows:
 - **Market Opportunity Assessment:** Unexploited niches and growth areas
 - **Risk Factors:** Potential threats and mitigation strategies
 
+#### 7. RECENT DEVELOPMENTS & NEWS ANALYSIS
+- **Company News (${company.NAME}):** Latest announcements, achievements, product launches (with dates)
+- **Competitor Updates:** Recent news from all competitors (with specific dates)
+- **Industry Events:** Significant developments in ${company.INDUSTRY} sector (recent 3-6 months)
+- **Market-Moving Events:** Partnerships, acquisitions, funding, awards, regulatory changes
+- **Strategic Implications:** How recent events affect competitive positioning
+
+**RESEARCH REQUIREMENT:** Before completing this analysis, research and include:
+- Latest news articles about ${company.NAME} and competitors
+- Recent press releases and announcements
+- Industry news affecting the ${company.INDUSTRY} sector
+- Recent awards, recognition, or achievements
+- New product/service launches with dates
+- Recent partnerships, acquisitions, or strategic moves
+
+For EVERY news item or event mentioned, include:
+1. Specific date (month/year minimum)
+2. Source or context
+3. Strategic significance
+4. Impact on competitive positioning
+
 ## QUALITY ASSURANCE STANDARDS
 
 ### Data Accuracy Requirements:
@@ -1515,6 +1556,9 @@ Provide a comprehensive report structured as follows:
 - Cross-reference metrics against stated industry benchmarks
 - Ensure logical consistency throughout the analysis
 - Validate strategic recommendations against available data
+- **NEVER use placeholder terms like "Market Player", "User", "Competitor 1/2/3", "Company X/Y/Z"**
+- **ALWAYS use actual company names** provided in the data (e.g., "${company.NAME}" and specific competitor names)
+- **Refer to companies by their real names throughout the entire report**
 
 ### Professional Standards:
 - Use formal business terminology and consulting language
@@ -2940,6 +2984,30 @@ Provide a strategic 3-paragraph executive summary covering:
 - **Quality Assurance Maintenance:** Standard preservation, consistency assurance, and excellence maintenance
 - **Stakeholder Communication Plans:** Transparency maintenance, expectation management, and relationship preservation
 
+### 7. RECENT DEVELOPMENTS & MARKET INTELLIGENCE INTEGRATION
+#### Latest News, Events & Achievements Analysis
+
+**RESEARCH REQUIREMENT:** Before creating this 30-60-90 day plan, research and incorporate:
+- Latest news about ${company.NAME} (past 3-6 months)
+- Recent achievements, awards, partnerships, or funding announcements
+- New product/service launches or major updates
+- Competitor recent moves and announcements
+- Industry news affecting ${company.INDUSTRY || 'the industry'} sector
+- Market trends and regulatory changes
+- Recent customer feedback or reputation events
+
+**Integration Guidelines:**
+- Reference specific recent events with dates in your strategic recommendations
+- Build action items that leverage recent positive developments
+- Address risks emerging from recent competitor moves or market changes
+- Incorporate lessons from recent industry events
+- Align timeline with upcoming known events or seasonal factors
+
+For any recent development mentioned:
+1. Include specific date (month/year minimum)
+2. Explain strategic relevance to the 30-60-90 day plan
+3. Recommend concrete actions based on this intelligence
+
 ## STRATEGIC EXECUTION EXCELLENCE STANDARDS
 
 ### Implementation Rigor Requirements:
@@ -2947,6 +3015,9 @@ Provide a strategic 3-paragraph executive summary covering:
 - Provide clear timeline specifications with milestone checkpoints and progress measurement criteria
 - Ensure resource allocation aligns with business priorities and available capability constraints
 - Validate all strategic initiatives against competitive advantage development and market positioning goals
+- **NEVER use generic placeholders** like "Market Player", "User", "Customer X", "Competitor Y"
+- **ALWAYS refer to ${company.NAME} by its actual name** throughout all action items and recommendations
+- **Use specific company names** from the competitive data when referencing competitors
 
 ### Performance Optimization Focus:
 - Prioritize actions by business impact potential and implementation feasibility assessment
@@ -2974,6 +3045,17 @@ ${dateNote}
 
 ## REVENUE STRATEGY CONSULTANT PROFILE
 You are a senior revenue strategy consultant with 10+ years of experience in business model innovation, monetization optimization, and revenue stream diversification. You have designed revenue models for Fortune 500 companies, led fintech and SaaS pricing strategies, and specialize in subscription economics, marketplace revenue models, and multi-sided platform monetization frameworks.
+
+## RECENT MARKET INTELLIGENCE & NEWS RESEARCH
+**CRITICAL RESEARCH REQUIREMENT:** Before generating this revenue model canvas, research and incorporate:
+- Recent news about ${company.NAME} - pricing changes, new revenue streams, funding (past 3-6 months)
+- Competitor monetization announcements and pricing updates
+- Industry revenue model trends in ${company.INDUSTRY || 'the sector'}
+- Recent partnerships or business model pivots
+- Market events affecting pricing or revenue strategies
+- Recent customer feedback about pricing or value perception
+
+**Include specific dates** and explain how recent developments inform your revenue recommendations.
 
 ## REVENUE MODEL DEVELOPMENT MISSION
 Create a comprehensive Revenue Model Canvas to identify, optimize, and diversify revenue streams while establishing sustainable competitive advantages. This analysis will provide a systematic framework for revenue generation, pricing strategy optimization, and long-term financial sustainability across multiple business scenarios and market conditions.
@@ -3134,6 +3216,9 @@ Provide a strategic 3-paragraph executive summary covering:
 - Provide specific financial modeling with revenue calculations, growth projections, and profitability analysis
 - Ensure revenue strategies align with customer value delivery and market positioning objectives
 - Validate revenue models against industry standards and competitive performance benchmarks
+- **NEVER use placeholder names** like "Market Player", "User Segment X", "Customer Type Y"
+- **ALWAYS use ${company.NAME}** and actual competitor names from the provided data
+- **Use professional, specific terminology** - no generic placeholders
 
 ### Strategic Revenue Implementation Focus:
 - Prioritize revenue opportunities by implementation feasibility and revenue impact potential
@@ -3165,6 +3250,17 @@ function generateChurnFixPrompt(company, competitors) {
 
 ## CUSTOMER SUCCESS SPECIALIST PROFILE
 You are a senior customer success strategist with 10+ years of experience in churn reduction, customer retention optimization, and loyalty program development. You have led customer success initiatives for Fortune 500 SaaS companies, managed enterprise retention programs, and specialize in predictive churn analytics, customer lifecycle management, and proactive retention strategy implementation.
+
+## RECENT CUSTOMER INTELLIGENCE & NEWS RESEARCH
+**CRITICAL RESEARCH REQUIREMENT:** Before generating this churn prevention strategy, research and incorporate:
+- Recent news about ${company.NAME} - customer feedback, reviews, reputation events (past 3-6 months)
+- Recent customer satisfaction trends or public feedback
+- Competitor retention programs or customer experience announcements
+- Industry churn benchmarks and retention best practices in ${company.INDUSTRY || 'the sector'}
+- Recent service changes, pricing updates, or product issues
+- Market events affecting customer expectations or competitive alternatives
+
+**Include specific dates** and explain how recent customer-related events inform your retention recommendations.
 
 ## CHURN PREVENTION MISSION
 Develop a comprehensive churn prevention strategy to identify at-risk customers, implement proactive retention measures, and optimize customer lifetime value through systematic churn reduction. This analysis will provide actionable frameworks to minimize customer attrition, enhance satisfaction, and build sustainable customer loyalty programs.
@@ -3324,6 +3420,9 @@ Provide a strategic 3-paragraph summary covering:
 - Provide specific retention tactics with implementation timelines and success metrics
 - Ensure recommendations align with customer lifetime value optimization and satisfaction improvement
 - Validate retention approaches against industry benchmarks and competitive performance standards
+- **NEVER use placeholder terms** like "User", "Customer X", "Market Player", "Segment Y"
+- **ALWAYS refer to ${company.NAME}** by its actual name in all retention strategies
+- **Use professional customer segment terminology** instead of generic placeholders
 
 ### Proactive Retention Implementation:
 - Prioritize retention initiatives by churn risk impact and implementation feasibility
@@ -3557,6 +3656,17 @@ function generateGTMPlanPrompt(company, competitors) {
 ## GO-TO-MARKET STRATEGIST PROFILE
 You are a senior go-to-market consultant with 10+ years of experience in product launch strategy, market entry planning, and revenue acceleration programs. You have led successful GTM initiatives for Fortune 500 companies, managed multi-million dollar product launches, and specialize in customer acquisition strategy, sales enablement, and market penetration optimization across B2B and B2C markets.
 
+## RECENT MARKET INTELLIGENCE & LAUNCH RESEARCH
+**CRITICAL RESEARCH REQUIREMENT:** Before developing this GTM strategy, research and incorporate:
+- Recent news about ${company.NAME} - product launches, market expansions, partnerships (past 3-6 months)
+- Competitor GTM activities, product launches, or market entry announcements
+- Industry trends and market conditions in ${company.INDUSTRY || 'the sector'}
+- Recent customer acquisition channels or marketing innovations
+- Market events, regulatory changes, or seasonal factors affecting launch timing
+- Recent success stories or case studies in similar launches
+
+**Include specific dates** and explain how recent market developments inform your GTM recommendations.
+
 ## GO-TO-MARKET MISSION
 Develop a comprehensive go-to-market strategy to accelerate customer acquisition, optimize market penetration, and establish competitive positioning for sustainable revenue growth. This plan will provide systematic frameworks for target market identification, customer acquisition optimization, and scalable revenue generation across multiple channels and customer segments.
 
@@ -3722,6 +3832,9 @@ Provide a strategic 3-paragraph summary covering:
 - Provide specific implementation timelines with resource requirements and success milestones
 - Ensure strategies align with competitive positioning and sustainable competitive advantage development
 - Validate approaches against industry benchmarks and proven GTM methodologies
+- **NEVER use generic terms** like "Market Player", "User Type", "Competitor X", "Customer Segment Y"
+- **ALWAYS use ${company.NAME}** and actual competitor names from the provided data
+- **Describe customer segments professionally** using industry-standard persona terminology
 
 ### Execution-Focused Implementation:
 - Prioritize activities by market impact potential and implementation feasibility assessment
@@ -3753,6 +3866,17 @@ function generateValuePropositionPrompt(company, competitors) {
 
 ## VALUE PROPOSITION STRATEGIST PROFILE
 You are a senior value proposition consultant with 10+ years of experience in brand positioning, customer value optimization, and competitive differentiation strategy. You have crafted value propositions for Fortune 500 companies, led market positioning initiatives across multiple industries, and specialize in customer-centric value articulation, benefit communication optimization, and competitive advantage messaging frameworks.
+
+## RECENT COMPETITIVE INTELLIGENCE & POSITIONING RESEARCH
+**CRITICAL RESEARCH REQUIREMENT:** Before crafting this value proposition, research and incorporate:
+- Recent news about ${company.NAME} - unique offerings, differentiators, customer wins (past 3-6 months)
+- Competitor positioning changes, messaging updates, or value proposition shifts
+- Industry value trends in ${company.INDUSTRY || 'the sector'}
+- Recent customer testimonials, case studies, or success stories
+- Market perception changes or brand reputation events
+- Recent innovations or unique capabilities introduced
+
+**Include specific dates** and explain how recent developments strengthen or inform your value proposition recommendations.
 
 ## VALUE PROPOSITION DEVELOPMENT MISSION
 Create a compelling, differentiated value proposition that clearly articulates unique customer benefits, establishes competitive advantages, and drives customer acquisition through persuasive value communication. This analysis will provide a systematic framework for value definition, benefit articulation, and competitive positioning that resonates with target customers and drives business growth.
@@ -3910,6 +4034,9 @@ Provide a strategic 3-paragraph summary covering:
 - Provide specific, measurable value claims with quantifiable benefit articulation
 - Ensure value propositions align with target customer priorities and decision-making criteria
 - Validate value claims against competitive alternatives and market positioning requirements
+- **NEVER use placeholder names** like "Market Player", "User", "Customer X", "Competitor Y/Z"
+- **ALWAYS refer to ${company.NAME}** by its actual name in all value statements
+- **Use actual competitor names** from the provided data when making comparisons
 
 ### Differentiation and Positioning Clarity:
 - Prioritize unique benefits that create sustainable competitive advantages
@@ -3941,6 +4068,17 @@ function generatePivotIdeasPrompt(company, competitors) {
 
 ## BUSINESS INNOVATION STRATEGIST PROFILE
 You are a senior business innovation consultant with 10+ years of experience in corporate pivoting, adjacency strategy, and business model transformation. You have led pivot initiatives for Fortune 500 companies, managed startup transformation programs, and specialize in market opportunity identification, business model innovation, and strategic diversification across multiple industries and market conditions.
+
+## RECENT MARKET TRENDS & INNOVATION RESEARCH
+**CRITICAL RESEARCH REQUIREMENT:** Before generating pivot ideas, research and incorporate:
+- Recent news about ${company.NAME} - challenges, opportunities, market shifts (past 3-6 months)
+- Successful pivot examples in ${company.INDUSTRY || 'the industry'} or related sectors
+- Emerging market trends, technologies, or customer behavior changes
+- Competitor strategic shifts or business model innovations
+- Industry disruptions, regulatory changes, or market opportunities
+- Recent success stories of companies that successfully pivoted
+
+**Include specific dates** and real-world examples to support pivot recommendations with evidence of market validation.
 
 ## PIVOT STRATEGY DEVELOPMENT MISSION
 Identify and develop strategic pivot opportunities and adjacent business plays to expand market reach, diversify revenue streams, and create new competitive advantages. This analysis will provide systematic frameworks for business transformation, market expansion, and innovation-driven growth that leverages existing capabilities while exploring new market opportunities.
@@ -4100,6 +4238,9 @@ Provide a strategic 3-paragraph summary covering:
 - Provide specific implementation strategies with realistic timelines and resource requirements
 - Ensure pivot strategies align with core competency leverage and sustainable competitive advantage creation
 - Validate innovation approaches against market trends and competitive landscape evolution
+- **NEVER use generic placeholders** like "Market Player", "User", "Company X", "Competitor Y"
+- **ALWAYS refer to ${company.NAME}** by its actual name throughout all pivot recommendations
+- **Use real company examples** when citing pivot success stories (e.g., "Netflix", "Amazon", not "Company X")
 
 ### Strategic Transformation Implementation:
 - Prioritize pivot opportunities by market potential and execution feasibility assessment
@@ -5302,6 +5443,11 @@ function generateActionPlanPrompt(company, competitor, userInput, status, existi
   prompt += `   - Customer Experience & Engagement\n`;
   prompt += `   - Competitive Differentiation\n`;
   prompt += `   - Performance Metrics & KPIs\n\n`;
+  
+  prompt += `**CRITICAL NAMING REQUIREMENT:**\n`;
+  prompt += `- **NEVER use placeholder terms** like "Market Player", "User", "Customer X", "Competitor Y"\n`;
+  prompt += `- **ALWAYS use actual company names**: "${company.NAME}" and "${competitor.NAME}"\n`;
+  prompt += `- **Use professional, specific terminology** - no generic placeholders\n\n`;
   
   prompt += `Return as a well-organized bullet-point list. NO checkboxes, dropdowns, or input fields.\n\n`;
   prompt += `Example format:\n`;

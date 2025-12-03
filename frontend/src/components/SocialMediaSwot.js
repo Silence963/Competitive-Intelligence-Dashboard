@@ -2176,8 +2176,8 @@ const modalContentStyle = {
         borderRadius: 16,
         boxShadow: '0 4px 16px rgba(22, 119, 255, 0.08)',
         position: 'sticky',
-        top: '24px',
-        maxHeight: 'calc(100vh - 48px)',
+        top: '140px',
+        maxHeight: 'calc(100vh - 164px)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden'
