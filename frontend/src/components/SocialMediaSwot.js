@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/components.css";
+import "../styles/mobile.css";
 import { marked } from "marked";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -24,6 +25,9 @@ const SocialMediaSwot = () => {
   const [showActionPlanModal, setShowActionPlanModal] = useState(false);
   const [showApiManager, setShowApiManager] = useState(false);
   const [isAddingCompetitor, setIsAddingCompetitor] = useState(false);
+  
+  // Mobile menu state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Sidebar collapsible sections state
   const [reportsExpanded, setReportsExpanded] = useState(false);
@@ -257,6 +261,13 @@ const SocialMediaSwot = () => {
     }
   }, [selectedCompany, loadPreferences, userID, firmID]);
 
+  // Helper to close mobile menu
+  const closeMobileMenu = () => {
+    if (window.innerWidth <= 768) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   // Helper to close all modals/dropdowns
   const closeAllPopups = () => {
     setShowReportDropdown(false);
@@ -269,6 +280,7 @@ const SocialMediaSwot = () => {
     setShowMissingInfoModal(false);
     setShowExportProgress(false);
     setShowActionPlanModal(false);
+    closeMobileMenu();
     // Do not close API Manager here; it has its own close
   };
 
@@ -2056,7 +2068,30 @@ const modalContentStyle = {
           gap: 24
         }}>
           {/* Left: Title */}
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Hamburger Menu Button - Mobile Only */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              style={{
+                display: 'none',
+                background: 'rgba(255, 255, 255, 0.15)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 8,
+                padding: '10px 12px',
+                cursor: 'pointer',
+                color: '#ffffff',
+                fontSize: '20px',
+                lineHeight: 1,
+                transition: 'all 0.2s ease'
+              }}
+              className="mobile-menu-toggle"
+              onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.25)'}
+              onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.15)'}
+            >
+              {isMobileMenuOpen ? '✕' : '☰'}
+            </button>
+            
+            <div>
             <h1 style={{ 
               color: '#ffffff',
               fontSize: '1.75rem',
@@ -2075,6 +2110,7 @@ const modalContentStyle = {
             }}>
               Empower Your Future with AI-Driven Insights
             </p>
+            </div>
           </div>
           
           {/* Right: User Info & Actions */}
@@ -2083,7 +2119,7 @@ const modalContentStyle = {
             alignItems: 'center',
             gap: 16
           }}>
-            {/* User Info Badge */}
+            {/* User Info Badge - Show Company ID */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -2095,19 +2131,8 @@ const modalContentStyle = {
               gap: 12
             }}>
               <div style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.9)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 16 }}>👤</span>
-                <code style={{ 
-                  color: '#ffffff', 
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                  padding: '3px 8px', 
-                  borderRadius: 4,
-                  fontWeight: 600,
-                  fontSize: 12
-                }}>{userID}</code>
-              </div>
-              <div style={{ width: 1, height: 16, background: 'rgba(255, 255, 255, 0.3)' }}></div>
-              <div style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.9)', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: 16 }}>🏢</span>
+                <span style={{ fontWeight: 500 }}>Company ID:</span>
                 <code style={{ 
                   color: '#ffffff', 
                   backgroundColor: 'rgba(255, 255, 255, 0.2)', 
@@ -2115,40 +2140,9 @@ const modalContentStyle = {
                   borderRadius: 4,
                   fontWeight: 600,
                   fontSize: 12
-                }}>{firmID}</code>
+                }}>{selectedCompany || 'N/A'}</code>
               </div>
             </div>
-            
-            {/* Configure AI Button */}
-            <button
-              onClick={() => setShowApiManager(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(255, 255, 255, 0.2)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                color: '#ffffff',
-                padding: '8px 16px',
-                borderRadius: 8,
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              <span>⚙️</span>
-              Configure AI
-            </button>
           </div>
         </div>
       </div>
@@ -2166,9 +2160,28 @@ const modalContentStyle = {
         }}>
     
     {/* Dashboard Layout with Left Sidebar */}
-    <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+    <div className="dashboard-layout" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', position: 'relative' }}>
+      
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 998,
+            display: 'none'
+          }}
+          className="mobile-menu-overlay"
+        />
+      )}
+      
       {/* Left Sidebar - Action Menu */}
-      <aside style={{
+      <aside className={`sidebar-menu ${isMobileMenuOpen ? 'mobile-open' : ''}`} style={{
         width: '280px',
         flexShrink: 0,
         background: 'var(--color-bg-card)',
@@ -2182,15 +2195,40 @@ const modalContentStyle = {
           flexDirection: 'column',
           overflow: 'hidden'
         }}>
-          <h3 style={{ 
+          <div style={{ 
             margin: '0', 
             padding: '24px 16px 12px',
-            color: 'var(--color-primary)', 
-            fontWeight: 700, 
-            fontSize: '1.25rem',
             borderBottom: '2px solid var(--color-border)',
-            flexShrink: 0
-          }}>Actions</h3>
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <h3 style={{ 
+              margin: 0,
+              color: 'var(--color-primary)', 
+              fontWeight: 700, 
+              fontSize: '1.25rem'
+            }}>Actions</h3>
+            
+            {/* Close button for mobile */}
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="mobile-menu-close"
+              style={{
+                display: 'none',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: 'var(--color-text-muted)',
+                padding: '4px 8px',
+                lineHeight: 1
+              }}
+            >
+              ✕
+            </button>
+          </div>
           
           {/* Action Menu List - Scrollable */}
           <nav style={{ 
@@ -2244,7 +2282,10 @@ const modalContentStyle = {
               }}>
               
               <button 
-                onClick={openCompetitorsModal} 
+                onClick={() => {
+                  openCompetitorsModal();
+                  closeMobileMenu();
+                }}
                 disabled={!selectedCompany}
                 className="sidebar-nav-link"
                 style={{ 
@@ -2276,7 +2317,10 @@ const modalContentStyle = {
               </button>
               
               <button 
-                onClick={openAddCompetitorModal}
+                onClick={() => {
+                  openAddCompetitorModal();
+                  closeMobileMenu();
+                }}
                 disabled={!selectedCompany || isAddingCompetitor}
                 className="sidebar-nav-link"
                 style={{ 
@@ -2447,7 +2491,10 @@ const modalContentStyle = {
               }}>
               
               <button 
-                onClick={openPreferencesModal} 
+                onClick={() => {
+                  openPreferencesModal();
+                  closeMobileMenu();
+                }}
                 disabled={!selectedCompany}
                 className="sidebar-nav-link"
                 style={{ 
@@ -2477,9 +2524,44 @@ const modalContentStyle = {
                 <span style={{ marginRight: '8px' }}>⚙️</span>
                 Edit SWOT Preferences
               </button>
+
+              <button 
+                onClick={() => {
+                  setShowApiManager(true);
+                  closeMobileMenu();
+                }}
+                className="sidebar-nav-link"
+                style={{ 
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '14px',
+                  fontWeight: 500
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--color-bg-hover)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                }}
+              >
+                <span style={{ marginRight: '8px' }}>🤖</span>
+                Configure AI
+              </button>
               
               <button 
-                onClick={openSavedReportsModal} 
+                onClick={() => {
+                  openSavedReportsModal();
+                  closeMobileMenu();
+                }}
                 disabled={!selectedCompany}
                 className="sidebar-nav-link"
                 style={{ 
@@ -2659,7 +2741,10 @@ const modalContentStyle = {
               
               <button 
                 className="btn btn-primary"
-                onClick={() => setShowReportModal(true)}
+                onClick={() => {
+                  setShowReportModal(true);
+                  closeMobileMenu();
+                }}
                 style={{
                   background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%)',
                   border: 'none',

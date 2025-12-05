@@ -302,9 +302,9 @@ app.get("/competitors", async (req, res) => {
       });
     }
     
-    // Filter companies by user ownership
+    // Filter companies by user ownership and include COMPANY_ID (VEND_ID from kfvendor)
     const rows = await db.query(
-      "SELECT COMPANY_ID as id, NAME as name FROM COMPA_COMPANIES WHERE MAIN_USERID = ? ORDER BY NAME",
+      "SELECT COMPANY_ID as id, NAME as name, COMPANY_ID as companyId FROM COMPA_COMPANIES WHERE MAIN_USERID = ? ORDER BY NAME",
       [userId]
     );
     res.json(rows);
